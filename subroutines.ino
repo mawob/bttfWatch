@@ -282,6 +282,10 @@ void screenInit(uint8_t screen) {
 //             input force  =0(nothing)  =1(force update)
 // rethink blink colon - works only in seconds-mode
 // ---------------------------------------------------------------
+
+// dw add code to reset step count when the day changes
+uint8_t yday = 99;    // dw yesterday, start at 99 so never = to a real day
+
 void displayDateTime(uint8_t force)
 {
    uint16_t colDark7segm = color565(13,13,0);    // color of a dark segment in 7-seg display
@@ -314,6 +318,13 @@ void displayDateTime(uint8_t force)
    mmonth = tnow.month;
    yyear = tnow.year; 
 
+   // dw reset step counter when day changes
+   if (dday != yday){
+      log_i("reset setcounter: %d != %d", dday, yday );
+      yday = dday;  // set yesterday to today as flag that counter was reset
+      ttgo->bma->resetStepCounter();
+   }
+   
    uint8_t font = 7;     // 7-segment font
    ttgo->tft->setTextSize(1);
    ttgo->tft->setTextColor(colDark7segm, TFT_BLACK); // color for dark segments 
